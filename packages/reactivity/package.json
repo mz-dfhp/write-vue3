@@ -1,0 +1,21 @@
+{
+  "name": "@vue/reactivity",
+  "version": "1.0.0",
+  "description": "@vue/reactivity",
+  "main": "index.js",
+  "buildOptions":{
+    "name":"VueReactivity",
+    "fomats":[
+      "esm-bundler",
+      "esm-browser",
+      "cjs",
+      "global"
+    ]
+  },
+  "keywords": [
+    "mini-vue3",
+    "vue3",
+    "vue"
+  ],
+  "author": "mz-dfhp"
+}

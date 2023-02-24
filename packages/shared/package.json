@@ -1,0 +1,19 @@
+{
+  "name": "@vue/shared",
+  "version": "1.0.0",
+  "description": "内部共享模块utils",
+  "main": "index.js",
+  "buildOptions":{
+    "name":"VueReactivity",
+    "fomats":[
+      "esm-bundler",
+      "cjs"
+    ]
+  },
+  "keywords": [
+    "mini-vue3",
+    "vue3",
+    "vue"
+  ],
+  "author": "mz-dfhp"
+}
