@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.ts", "../../shared/src/index.ts"],
+  "sourcesContent": ["export * from '@vue/shared'\nexport const reactive = () => {\n  console.log(1)\n}\n", "export const addNum = (a: number, b: number) => {\n  return a + b\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;;;ACAO,MAAM,SAAS,CAAC,GAAW,MAAc;AAC9C,WAAO,IAAI;AAAA,EACb;;;ADDO,MAAM,WAAW,MAAM;AAC5B,YAAQ,IAAI,CAAC;AAAA,EACf;",
+  "names": []
+}

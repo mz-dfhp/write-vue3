@@ -1,6 +1,4 @@
-import { addNum } from '@vue/shared'
-
-console.log(addNum(1, 2))
+export * from '@vue/shared'
 export const reactive = () => {
   console.log(1)
 }

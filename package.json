@@ -8,7 +8,7 @@
     "lint-eslint": "eslint --cache --cache-location node_modules/.cache/eslint/ --ext .ts packages/*/{src,__tests__}/**.ts",
     "lint-prettier": "prettier --write --cache --parser typescript \"**/*.[tj]s?(x)\"",
     "lint:lint-staged": "lint-staged",
-    "dev": "node scripts/dev.js reactivity -f glabal",
+    "dev": "node scripts/dev.js reactivity -f global",
     "build": "node scripts/build.js",
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky install"
