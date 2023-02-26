@@ -1,15 +1,3 @@
-## reactivity
-
-vue2 采用Object.defineProperty 对数据进行劫持 需要对属性重新添加getter setter
-
-vue3 则采用proxy实现响应式数据变化 
-
-### 核心 effect reactive
-effect  副作用函数 此函数依赖的数据变化了 会重新执行
-
-reactive 将对象变为响应式
-
-```
 <!DOCTYPE html>
 <html lang="en">
 
@@ -44,7 +32,3 @@ reactive 将对象变为响应式
 </body>
 
 </html>
-```
-
-
-可以看到 name age变化时  effect会重新执行函数

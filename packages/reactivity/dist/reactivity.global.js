@@ -21,19 +21,52 @@ var VueReactivity = (() => {
   // packages/reactivity/src/index.ts
   var src_exports = {};
   __export(src_exports, {
-    addNum: () => addNum,
+    effect: () => effect,
     reactive: () => reactive
   });
 
   // packages/shared/src/index.ts
-  var addNum = (a, b) => {
-    return a + b;
+  var isObject = (val) => typeof val !== null && typeof val === "object";
+  var isFunction = (fn) => typeof fn === "function";
+
+  // packages/reactivity/src/effect.ts
+  var ReactiveEffect = class {
+    constructor(fn) {
+      this.fn = fn;
+    }
+    run() {
+      this.fn();
+    }
+  };
+  function effect(fn) {
+    if (!isFunction)
+      console.warn("effect \u4F20\u5165\u5FC5\u987B\u662F\u4E00\u4E2A\u51FD\u6570\uFF01");
+    const _effect = new ReactiveEffect(fn);
+    _effect.run();
+  }
+
+  // packages/reactivity/src/baseHandlers.ts
+  var mutableHandlers = {
+    get(target, key, receiver) {
+      return Reflect.get(target, key, receiver);
+    },
+    set(target, key, value) {
+      const result = Reflect.set(target, key, value);
+      return result;
+    }
   };
 
-  // packages/reactivity/src/index.ts
-  var reactive = () => {
-    console.log(1);
-  };
+  // packages/reactivity/src/reactive.ts
+  function reactive(target) {
+    return createReactiveObject(target);
+  }
+  function createReactiveObject(target) {
+    if (!isObject) {
+      console.warn("\u54CD\u5E94\u5F0F\u5143\u7D20\u5FC5\u987B\u662F\u4E00\u4E2A\u5BF9\u8C61\uFF01");
+      return isObject;
+    }
+    return new Proxy(target, mutableHandlers);
+  }
   return __toCommonJS(src_exports);
 })();
 //# sourceMappingURL=reactivity.global.js.map
