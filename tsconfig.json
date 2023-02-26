@@ -19,12 +19,12 @@
     "removeComments": false,
     "jsx": "preserve",
     "lib": ["esnext", "dom"],
-    "types": [],
+    "types": ["vitest/globals"],
     "rootDir": ".",
     "paths": {
       "@vue/*": ["packages/*/src"],
       "vue": ["packages/vue/src"]
     }
   },
-  "include": ["packages/*/src"]
+  "include": ["packages/*/src", "packages/*/__tests__"]
 }

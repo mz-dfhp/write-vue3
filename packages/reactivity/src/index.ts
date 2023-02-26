@@ -1,4 +1,4 @@
-export * from '@vue/shared'
-export const reactive = () => {
-  console.log(1)
-}
+import { effect } from './effect'
+import { reactive } from './reactive'
+
+export { effect, reactive }
