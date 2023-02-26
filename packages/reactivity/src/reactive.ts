@@ -14,7 +14,7 @@ export function reactive(target: any) {
 function createReactiveObject(target: any) {
   if (!isObject) {
     console.warn('响应式元素必须是一个对象！')
-    return isObject
+    return target
   }
   return new Proxy(target, mutableHandlers)
 }
