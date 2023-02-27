@@ -16,5 +16,6 @@ function createReactiveObject(target: any) {
     console.warn('响应式元素必须是一个对象！')
     return target
   }
-  return new Proxy(target, mutableHandlers)
+  const proxy = new Proxy(target, mutableHandlers)
+  return proxy
 }

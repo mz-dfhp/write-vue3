@@ -9,10 +9,11 @@
 </head>
 
 <body>
-  <h1 id="app"></h1>
+  <div id="app"></div>
   <script src="../../node_modules/.pnpm/@vue+reactivity@3.2.47/node_modules/@vue/reactivity/dist/reactivity.global.js">
   </script>
   <script>
+    debugger
     const { effect, reactive } = VueReactivity
     const userState = reactive({
       name: 'mz',
@@ -23,8 +24,8 @@
     })
     setTimeout(() => {
       userState.name = 'mz-dfhp'
+      debugger
     }, 2000)
-
     setTimeout(() => {
       userState.age = '24'
     }, 4000)

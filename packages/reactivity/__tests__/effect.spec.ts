@@ -12,5 +12,9 @@ describe('effect', () => {
       nextAge = userState.age + 1
     })
     expect(nextAge).toBe(19)
+
+    userState.age = 24
+
+    expect(nextAge).toBe(25)
   })
 })

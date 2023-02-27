@@ -28,10 +28,20 @@ var VueReactivity = (() => {
   // packages/shared/src/index.ts
   var isObject = (val) => typeof val !== null && typeof val === "object";
   var isFunction = (fn) => typeof fn === "function";
+  var isArray = Array.isArray;
+
+  // packages/reactivity/src/dep.ts
+  var createDep = (effects) => {
+    const dep = new Set(effects);
+    return dep;
+  };
 
   // packages/reactivity/src/effect.ts
+  var activeEffect;
   var ReactiveEffect = class {
     constructor(fn) {
+      this.fn = fn;
+      activeEffect = this;
       this.fn = fn;
     }
     run() {
@@ -44,14 +54,61 @@ var VueReactivity = (() => {
     const _effect = new ReactiveEffect(fn);
     _effect.run();
   }
+  var targetMap = /* @__PURE__ */ new WeakMap();
+  function track(target, key) {
+    let depsMap = targetMap.get(target);
+    if (!depsMap) {
+      targetMap.set(target, depsMap = /* @__PURE__ */ new Map());
+    }
+    let dep = depsMap.get(key);
+    if (!dep) {
+      depsMap.set(key, dep = createDep());
+    }
+    trackEffects(dep);
+  }
+  function trackEffects(dep) {
+    let shouldTrack = false;
+    shouldTrack = !dep.has(activeEffect);
+    if (shouldTrack) {
+      dep.add(activeEffect);
+    }
+  }
+  function trigger(target, key) {
+    const depsMap = targetMap.get(target);
+    if (!depsMap)
+      return;
+    const deps = [];
+    const dep = depsMap.get(key);
+    deps.push(dep);
+    if (deps.length === 1) {
+      deps[0] && triggerEffects(deps[0]);
+    } else {
+      const effects = [];
+      for (const dep2 of deps) {
+        dep2 && effects.push(...dep2);
+      }
+      triggerEffects(createDep(effects));
+    }
+  }
+  function triggerEffects(dep) {
+    const effects = isArray(dep) ? dep : [...dep];
+    for (const effect2 of effects) {
+      triggerEffect(effect2);
+    }
+  }
+  function triggerEffect(effect2) {
+    effect2.run();
+  }
 
   // packages/reactivity/src/baseHandlers.ts
   var mutableHandlers = {
     get(target, key, receiver) {
+      track(target, key);
       return Reflect.get(target, key, receiver);
     },
     set(target, key, value) {
       const result = Reflect.set(target, key, value);
+      trigger(target, key);
       return result;
     }
   };
@@ -63,9 +120,10 @@ var VueReactivity = (() => {
   function createReactiveObject(target) {
     if (!isObject) {
       console.warn("\u54CD\u5E94\u5F0F\u5143\u7D20\u5FC5\u987B\u662F\u4E00\u4E2A\u5BF9\u8C61\uFF01");
-      return isObject;
+      return target;
     }
-    return new Proxy(target, mutableHandlers);
+    const proxy = new Proxy(target, mutableHandlers);
+    return proxy;
   }
   return __toCommonJS(src_exports);
 })();
