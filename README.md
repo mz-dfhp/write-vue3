@@ -7,3 +7,19 @@
 docs目录
 
 文档完善中...
+
+### 实现
+- [X] 环境搭建
+- [X] 项目构建
+- [X] 单元测试
+- [X] reactive
+- [X] effect
+- [X] 依赖收集
+- [ ] 分支切换
+- [ ] shallowReactive
+- [ ] readonly
+- [ ] scheduler
+- [ ] computed
+- [ ] watch
+- [ ] ref
+- [ ] ....

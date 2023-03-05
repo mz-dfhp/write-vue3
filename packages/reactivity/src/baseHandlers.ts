@@ -1,4 +1,5 @@
 import { track, trigger } from './effect'
+import { TrackOpTypes, TriggerOpTypes } from './operations'
 import { ReactiveFlags } from './reactive'
 
 // 为什么用 Reflect
@@ -16,7 +17,7 @@ export const mutableHandlers: ProxyHandler<object> = {
     // 控制 已经被代理过的对象 flag
     if (key === ReactiveFlags.IS_REACTIVE) return true
     // 收集依赖
-    track(target, key)
+    track(target, TrackOpTypes.GET, key)
     return Reflect.get(target, key, receiver)
   },
   set(target, key, value) {
@@ -25,9 +26,8 @@ export const mutableHandlers: ProxyHandler<object> = {
     // 如果新值等于旧值 则不需要更新
     if (oldValue !== value) {
       // 触发依赖
-      trigger(target, key)
+      trigger(target, TriggerOpTypes.SET, key)
     }
-
     return result
   }
 }

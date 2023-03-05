@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
 </head>
+
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <h1 id="user"></h1>
+    <h2 id="name"></h2>
+    <h2 id="age"></h2>
+    <h2 id="sex"></h2>
+  </div>
   <script src="../../packages/reactivity/dist/reactivity.global.js">
   </script>
   <script>
@@ -15,9 +22,19 @@
     const userState = reactive({
       name: 'mz',
       age: '18',
+      sex: 1
     })
     effect(() => {
-      document.querySelector('#app').innerHTML = `${userState.name}  ${userState.age}`
+      document.querySelector('#user').innerHTML = `${userState.name} ${userState.age} ${userState.sex}`
+      effect(() => {
+        document.querySelector('#name').innerHTML = `${userState.name}`
+        effect(() => {
+          document.querySelector('#age').innerHTML = `${userState.age}`
+          effect(() => {
+            document.querySelector('#sex').innerHTML = `${userState.sex}`
+          })
+        })
+      })
     })
     setTimeout(() => {
       userState.name = 'mz-dfhp'
@@ -26,6 +43,11 @@
     setTimeout(() => {
       userState.age = '24'
     }, 4000)
+
+    setTimeout(() => {
+      userState.sex = 0
+    }, 6000)
   </script>
 </body>
+
 </html>

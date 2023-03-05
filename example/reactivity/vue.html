@@ -9,26 +9,45 @@
 </head>
 
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <h1 id="user"></h1>
+    <h2 id="name"></h2>
+    <h2 id="age"></h2>
+    <h2 id="sex"></h2>
+  </div>
   <script src="../../node_modules/.pnpm/@vue+reactivity@3.2.47/node_modules/@vue/reactivity/dist/reactivity.global.js">
   </script>
   <script>
-    debugger
     const { effect, reactive } = VueReactivity
     const userState = reactive({
       name: 'mz',
       age: '18',
+      sex: 1
     })
     effect(() => {
-      document.querySelector('#app').innerHTML = `${userState.name}  ${userState.age}`
+      document.querySelector('#user').innerHTML = `${userState.name} ${userState.age} ${userState.sex}`
+      effect(() => {
+        document.querySelector('#name').innerHTML = `${userState.name}`
+        effect(() => {
+          document.querySelector('#age').innerHTML = `${userState.age}`
+          effect(() => {
+            document.querySelector('#sex').innerHTML = `${userState.sex}`
+          })
+        })
+      })
+
     })
     setTimeout(() => {
       userState.name = 'mz-dfhp'
-      debugger
     }, 2000)
+
     setTimeout(() => {
       userState.age = '24'
     }, 4000)
+
+    setTimeout(() => {
+      userState.sex = 0
+    }, 6000)
   </script>
 </body>
 

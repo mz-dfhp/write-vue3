@@ -39,13 +39,32 @@ var VueReactivity = (() => {
   // packages/reactivity/src/effect.ts
   var activeEffect;
   var ReactiveEffect = class {
+    // 父 effect 默认null
     constructor(fn) {
       this.fn = fn;
-      activeEffect = this;
+      this.active = true;
+      // 默认激活状态
+      this.deps = [];
+      // 让 effect 记录dep
+      this.parent = void 0;
       this.fn = fn;
     }
+    // 执行effect
     run() {
-      this.fn();
+      if (!this.active) {
+        return this.fn();
+      }
+      try {
+        this.parent = activeEffect;
+        activeEffect = this;
+        return this.fn();
+      } finally {
+        activeEffect = this.parent;
+        this.parent = void 0;
+      }
+    }
+    stop() {
+      this.active = false;
     }
   };
   function effect(fn) {
@@ -55,7 +74,10 @@ var VueReactivity = (() => {
     _effect.run();
   }
   var targetMap = /* @__PURE__ */ new WeakMap();
-  function track(target, key) {
+  function track(target, type, key) {
+    console.log(type);
+    if (!activeEffect)
+      return;
     let depsMap = targetMap.get(target);
     if (!depsMap) {
       targetMap.set(target, depsMap = /* @__PURE__ */ new Map());
@@ -71,9 +93,11 @@ var VueReactivity = (() => {
     shouldTrack = !dep.has(activeEffect);
     if (shouldTrack) {
       dep.add(activeEffect);
+      activeEffect.deps.push(dep);
     }
   }
-  function trigger(target, key) {
+  function trigger(target, type, key) {
+    console.log(type);
     const depsMap = targetMap.get(target);
     if (!depsMap)
       return;
@@ -97,23 +121,34 @@ var VueReactivity = (() => {
     }
   }
   function triggerEffect(effect2) {
-    effect2.run();
+    if (effect2 !== activeEffect) {
+      console.log(effect2);
+      console.log(activeEffect);
+      debugger;
+      effect2.run();
+    }
   }
 
   // packages/reactivity/src/baseHandlers.ts
   var mutableHandlers = {
     get(target, key, receiver) {
-      track(target, key);
+      if (key === "__v_isReactive" /* IS_REACTIVE */)
+        return true;
+      track(target, "get" /* GET */, key);
       return Reflect.get(target, key, receiver);
     },
     set(target, key, value) {
+      const oldValue = target[key];
       const result = Reflect.set(target, key, value);
-      trigger(target, key);
+      if (oldValue !== value) {
+        trigger(target, "set" /* SET */, key);
+      }
       return result;
     }
   };
 
   // packages/reactivity/src/reactive.ts
+  var reactiveMap = /* @__PURE__ */ new WeakMap();
   function reactive(target) {
     return createReactiveObject(target);
   }
@@ -122,7 +157,15 @@ var VueReactivity = (() => {
       console.warn("\u54CD\u5E94\u5F0F\u5143\u7D20\u5FC5\u987B\u662F\u4E00\u4E2A\u5BF9\u8C61\uFF01");
       return target;
     }
+    const existingProxy = reactiveMap.get(target);
+    if (existingProxy) {
+      return existingProxy;
+    }
+    if (target["__v_isReactive" /* IS_REACTIVE */]) {
+      return target;
+    }
     const proxy = new Proxy(target, mutableHandlers);
+    reactiveMap.set(target, proxy);
     return proxy;
   }
   return __toCommonJS(src_exports);
