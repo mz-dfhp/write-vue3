@@ -24,7 +24,7 @@
       age: '18',
       sex: 1
     })
-    effect(() => {
+    const runner = effect(() => {
       document.querySelector('#user').innerHTML = `${userState.name} ${userState.age} ${userState.sex}`
       effect(() => {
         document.querySelector('#name').innerHTML = `${userState.name}`
@@ -37,6 +37,7 @@
       })
 
     })
+    console.log(runner)
     setTimeout(() => {
       userState.name = 'mz-dfhp'
     }, 2000)

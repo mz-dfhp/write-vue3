@@ -78,6 +78,9 @@ export function effect<T = any>(fn: () => T) {
   if (!isFunction) console.warn('effect 传入必须是一个函数！')
   const _effect = new ReactiveEffect(fn)
   _effect.run()
+  // runner
+  // effect (fn) => runner  runner => fn
+  return _effect.run.bind(_effect)
 }
 
 // 存放依赖收集数据 {target -> key -> dep}

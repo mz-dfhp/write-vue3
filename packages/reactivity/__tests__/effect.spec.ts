@@ -17,4 +17,21 @@ describe('effect', () => {
 
     expect(nextAge).toBe(25)
   })
+
+  it('runner', function () {
+    const userState = reactive({
+      name: 'mz',
+      age: 18
+    })
+    let nextAge
+    const runner = effect(() => {
+      nextAge = userState.age + 1
+      return 'age'
+    })
+    expect(nextAge).toBe(19)
+    const r = runner()
+    userState.age = 24
+    expect(nextAge).toBe(25)
+    expect(r).toBe('age')
+  })
 })
