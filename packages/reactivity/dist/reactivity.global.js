@@ -57,6 +57,7 @@ var VueReactivity = (() => {
       try {
         this.parent = activeEffect;
         activeEffect = this;
+        cleanupEffect(this);
         return this.fn();
       } finally {
         activeEffect = this.parent;
@@ -67,6 +68,15 @@ var VueReactivity = (() => {
       this.active = false;
     }
   };
+  function cleanupEffect(effect2) {
+    const { deps } = effect2;
+    if (deps.length) {
+      for (let i = 0; i < deps.length; i++) {
+        deps[i].delete(effect2);
+      }
+      deps.length = 0;
+    }
+  }
   function effect(fn) {
     if (!isFunction)
       console.warn("effect \u4F20\u5165\u5FC5\u987B\u662F\u4E00\u4E2A\u51FD\u6570\uFF01");
@@ -124,7 +134,6 @@ var VueReactivity = (() => {
     if (effect2 !== activeEffect) {
       console.log(effect2);
       console.log(activeEffect);
-      debugger;
       effect2.run();
     }
   }

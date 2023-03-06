@@ -40,6 +40,8 @@ export class ReactiveEffect<T = any> {
     try {
       this.parent = activeEffect
       activeEffect = this as ReactiveEffect
+      // 分支切换 清除effect
+      cleanupEffect(this)
       return this.fn()
     } finally {
       // 执行完
@@ -49,6 +51,21 @@ export class ReactiveEffect<T = any> {
   }
   stop() {
     this.active = false
+  }
+}
+
+/**
+ * 清除依赖收集
+ * @param effect
+ */
+function cleanupEffect(effect: ReactiveEffect) {
+  const { deps } = effect
+  if (deps.length) {
+    for (let i = 0; i < deps.length; i++) {
+      // deps删除了effect targetMap中的 Set也删除了 利用循环引用 指向同一块地址
+      deps[i].delete(effect)
+    }
+    deps.length = 0
   }
 }
 

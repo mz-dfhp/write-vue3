@@ -15,7 +15,7 @@ docs目录
 - [X] reactive
 - [X] effect
 - [X] 依赖收集
-- [ ] 分支切换
+- [X] 分支切换
 - [ ] shallowReactive
 - [ ] readonly
 - [ ] scheduler

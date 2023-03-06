@@ -14,6 +14,7 @@
     <h2 id="name"></h2>
     <h2 id="age"></h2>
     <h2 id="sex"></h2>
+    <h2 id="change"></h2>
   </div>
   <script src="../../packages/reactivity/dist/reactivity.global.js">
   </script>
@@ -47,6 +48,18 @@
     setTimeout(() => {
       userState.sex = 0
     }, 6000)
+    // 分支切换
+    const changeState = reactive({
+      flag: false,
+      name: 'mz',
+      age: '18'
+    })
+    effect(() => {
+      document.querySelector('#change').innerHTML = `${changeState.flag ? changeState.name : changeState.age}`
+    })
+    setTimeout(() => {
+      changeState.flag = true
+    }, 8000)
   </script>
 </body>
 
