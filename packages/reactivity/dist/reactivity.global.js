@@ -82,6 +82,7 @@ var VueReactivity = (() => {
       console.warn("effect \u4F20\u5165\u5FC5\u987B\u662F\u4E00\u4E2A\u51FD\u6570\uFF01");
     const _effect = new ReactiveEffect(fn);
     _effect.run();
+    return _effect.run.bind(_effect);
   }
   var targetMap = /* @__PURE__ */ new WeakMap();
   function track(target, type, key) {
