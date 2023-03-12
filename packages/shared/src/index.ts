@@ -4,3 +4,5 @@ export const isObject = (val: unknown): val is Record<any, any> =>
 export const isFunction = (fn: unknown) => typeof fn === 'function'
 
 export const isArray = Array.isArray
+
+export const extend = Object.assign

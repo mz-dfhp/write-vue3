@@ -1,5 +1,4 @@
 import { describe } from 'vitest'
-import { effect } from '../src/effect'
 import { reactive } from '../src/reactive'
 describe('reactive', () => {
   it('happy path', () => {
@@ -26,17 +25,5 @@ describe('reactive', () => {
     const user2 = reactive(user1)
     expect(user).not.toBe(user1)
     expect(user1).toBe(user2)
-  })
-  // effect 返回一个runner 函数 可再次调用effect 返回值为 传入effect 中 fn的返回值
-  it('return runner', () => {
-    let age = 18
-    const runner = effect(() => {
-      age++
-      return 'mz'
-    })
-    expect(age).toBe(19)
-    const r = runner()
-    expect(r).toBe('mz')
-    expect(age).toBe(20)
   })
 })

@@ -1,6 +1,12 @@
-import { isFunction, isArray } from '@vue/shared'
+import { isFunction, isArray, extend } from '@vue/shared'
 import { createDep, Dep } from './dep'
 import { TrackOpTypes, TriggerOpTypes } from './operations'
+
+export type EffectScheduler = (...args: any[]) => any
+
+export interface ReactiveEffectOptions {
+  scheduler?: EffectScheduler
+}
 
 // 当前正在执行的 effect 全局使用
 let activeEffect: ReactiveEffect | undefined
@@ -13,7 +19,10 @@ export class ReactiveEffect<T = any> {
   deps: Dep[] = [] // 让 effect 记录dep
   parent: ReactiveEffect | undefined = undefined // 父 effect 默认null
 
-  constructor(public fn: () => T) {
+  constructor(
+    public fn: () => T,
+    public scheduler: EffectScheduler | null = null
+  ) {
     this.fn = fn
   }
   // 执行effect
@@ -74,9 +83,13 @@ function cleanupEffect(effect: ReactiveEffect) {
  * effect可以嵌套写 组件是基于effect
  * @param fn Function
  */
-export function effect<T = any>(fn: () => T) {
+export function effect<T = any>(fn: () => T, options?: ReactiveEffectOptions) {
   if (!isFunction) console.warn('effect 传入必须是一个函数！')
   const _effect = new ReactiveEffect(fn)
+
+  if (options) {
+    extend(_effect, options)
+  }
   _effect.run()
   // runner
   // effect (fn) => runner  runner => fn
@@ -166,8 +179,10 @@ function triggerEffect(effect: ReactiveEffect) {
   //   state.age = Math.random()
   // })
   if (effect !== activeEffect) {
-    console.log(effect)
-    console.log(activeEffect)
-    effect.run()
+    if (effect.scheduler) {
+      effect.scheduler()
+    } else {
+      effect.run()
+    }
   }
 }
