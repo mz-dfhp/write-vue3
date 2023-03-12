@@ -20,8 +20,8 @@ docs目录
 - [X] onStop
 - [X] runner
 - [X] scheduler
+- [X] readonly
 - [ ] shallowReactive
-- [ ] readonly
 - [ ] computed
 - [ ] watch
 - [ ] ref

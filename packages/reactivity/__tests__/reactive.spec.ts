@@ -1,5 +1,5 @@
 import { describe } from 'vitest'
-import { reactive } from '../src/reactive'
+import { reactive, isReactive } from '../src/reactive'
 describe('reactive', () => {
   it('happy path', () => {
     const user = { name: 'mz' }
@@ -23,6 +23,9 @@ describe('reactive', () => {
     const user = { name: 'mz' }
     const user1 = reactive(user)
     const user2 = reactive(user1)
+    expect(isReactive(user)).toBe(false)
+    expect(isReactive(user1)).toBe(true)
+    expect(isReactive(user2)).toBe(true)
     expect(user).not.toBe(user1)
     expect(user1).toBe(user2)
   })

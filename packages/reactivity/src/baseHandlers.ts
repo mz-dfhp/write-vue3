@@ -31,3 +31,14 @@ export const mutableHandlers: ProxyHandler<object> = {
     return result
   }
 }
+
+export const readonlyHandlers: ProxyHandler<object> = {
+  get(target, key, receiver) {
+    if (key === ReactiveFlags.IS_READONLY) return true
+    return Reflect.get(target, key, receiver)
+  },
+  set(target, key) {
+    console.warn(`设置${String(key)}失败`, target, '是只读对象')
+    return true
+  }
+}

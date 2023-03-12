@@ -22,7 +22,10 @@ var VueReactivity = (() => {
   var src_exports = {};
   __export(src_exports, {
     effect: () => effect,
-    reactive: () => reactive
+    isReactive: () => isReactive,
+    isReadonly: () => isReadonly,
+    reactive: () => reactive,
+    readonly: () => readonly
   });
 
   // packages/shared/src/index.ts
@@ -168,27 +171,51 @@ var VueReactivity = (() => {
       return result;
     }
   };
+  var readonlyHandlers = {
+    get(target, key, receiver) {
+      if (key === "__v_isReadonly" /* IS_READONLY */)
+        return true;
+      return Reflect.get(target, key, receiver);
+    },
+    set(target, key) {
+      console.warn(`\u8BBE\u7F6E${String(key)}\u5931\u8D25`, target, "\u662F\u53EA\u8BFB\u5BF9\u8C61");
+      return true;
+    }
+  };
 
   // packages/reactivity/src/reactive.ts
   var reactiveMap = /* @__PURE__ */ new WeakMap();
+  var readonlyMap = /* @__PURE__ */ new WeakMap();
   function reactive(target) {
-    return createReactiveObject(target);
+    if (isReadonly(target)) {
+      return target;
+    }
+    return createReactiveObject(target, mutableHandlers, reactiveMap);
   }
-  function createReactiveObject(target) {
+  function readonly(target) {
+    return createReactiveObject(target, readonlyHandlers, readonlyMap);
+  }
+  function createReactiveObject(target, baseHandlers, proxyMap) {
     if (!isObject) {
       console.warn("\u54CD\u5E94\u5F0F\u5143\u7D20\u5FC5\u987B\u662F\u4E00\u4E2A\u5BF9\u8C61\uFF01");
       return target;
     }
-    const existingProxy = reactiveMap.get(target);
+    const existingProxy = proxyMap.get(target);
     if (existingProxy) {
       return existingProxy;
     }
     if (target["__v_isReactive" /* IS_REACTIVE */]) {
       return target;
     }
-    const proxy = new Proxy(target, mutableHandlers);
-    reactiveMap.set(target, proxy);
+    const proxy = new Proxy(target, baseHandlers);
+    proxyMap.set(target, proxy);
     return proxy;
+  }
+  function isReactive(value) {
+    return !!(value && value["__v_isReactive" /* IS_REACTIVE */]);
+  }
+  function isReadonly(value) {
+    return !!(value && value["__v_isReadonly" /* IS_READONLY */]);
   }
   return __toCommonJS(src_exports);
 })();

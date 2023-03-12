@@ -19,12 +19,20 @@
   <script src="../../packages/reactivity/dist/reactivity.global.js">
   </script>
   <script>
-    const { effect, reactive } = VueReactivity
+    const { effect, reactive, isReactive, readonly } = VueReactivity
     const userState = reactive({
       name: 'mz',
       age: '18',
       sex: 1
     })
+    const user = { name: 'mz' }
+    const user1 = readonly(user)
+    const user2 = readonly(user1)
+    user1.age = 1
+    console.log(user)
+    console.log(user1)
+    console.log(user2)
+    console.log(isReactive(userState))
     effect(() => {
       document.querySelector('#user').innerHTML = `${userState.name} ${userState.age} ${userState.sex}`
       effect(() => {
@@ -58,7 +66,7 @@
       document.querySelector('#change').innerHTML = `${changeState.flag ? changeState.name : changeState.age}`
       return '123'
     })
-    runner.stop()
+    runner.effect.stop()
     setTimeout(() => {
       changeState.flag = true
     }, 8000)
