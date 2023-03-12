@@ -54,9 +54,11 @@
       name: 'mz',
       age: '18'
     })
-    effect(() => {
+    const runner = effect(() => {
       document.querySelector('#change').innerHTML = `${changeState.flag ? changeState.name : changeState.age}`
+      return '123'
     })
+    runner.stop()
     setTimeout(() => {
       changeState.flag = true
     }, 8000)

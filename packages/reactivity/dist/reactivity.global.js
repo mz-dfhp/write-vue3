@@ -29,6 +29,7 @@ var VueReactivity = (() => {
   var isObject = (val) => typeof val !== null && typeof val === "object";
   var isFunction = (fn) => typeof fn === "function";
   var isArray = Array.isArray;
+  var extend = Object.assign;
 
   // packages/reactivity/src/dep.ts
   var createDep = (effects) => {
@@ -39,9 +40,9 @@ var VueReactivity = (() => {
   // packages/reactivity/src/effect.ts
   var activeEffect;
   var ReactiveEffect = class {
-    // 父 effect 默认null
-    constructor(fn) {
+    constructor(fn, scheduler = null) {
       this.fn = fn;
+      this.scheduler = scheduler;
       this.active = true;
       // 默认激活状态
       this.deps = [];
@@ -65,7 +66,13 @@ var VueReactivity = (() => {
       }
     }
     stop() {
-      this.active = false;
+      if (this.active) {
+        cleanupEffect(this);
+        if (this.onStop) {
+          this.onStop();
+        }
+        this.active = false;
+      }
     }
   };
   function cleanupEffect(effect2) {
@@ -77,16 +84,20 @@ var VueReactivity = (() => {
       deps.length = 0;
     }
   }
-  function effect(fn) {
+  function effect(fn, options) {
     if (!isFunction)
       console.warn("effect \u4F20\u5165\u5FC5\u987B\u662F\u4E00\u4E2A\u51FD\u6570\uFF01");
     const _effect = new ReactiveEffect(fn);
+    if (options) {
+      extend(_effect, options);
+    }
     _effect.run();
-    return _effect.run.bind(_effect);
+    const runner = _effect.run.bind(_effect);
+    runner.effect = _effect;
+    return runner;
   }
   var targetMap = /* @__PURE__ */ new WeakMap();
   function track(target, type, key) {
-    console.log(type);
     if (!activeEffect)
       return;
     let depsMap = targetMap.get(target);
@@ -108,7 +119,6 @@ var VueReactivity = (() => {
     }
   }
   function trigger(target, type, key) {
-    console.log(type);
     const depsMap = targetMap.get(target);
     if (!depsMap)
       return;
@@ -133,9 +143,11 @@ var VueReactivity = (() => {
   }
   function triggerEffect(effect2) {
     if (effect2 !== activeEffect) {
-      console.log(effect2);
-      console.log(activeEffect);
-      effect2.run();
+      if (effect2.scheduler) {
+        effect2.scheduler();
+      } else {
+        effect2.run();
+      }
     }
   }
 

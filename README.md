@@ -16,6 +16,8 @@ docs目录
 - [X] effect
 - [X] 依赖收集
 - [X] 分支切换
+- [X] stop
+- [X] onStop
 - [X] runner
 - [X] scheduler
 - [ ] shallowReactive

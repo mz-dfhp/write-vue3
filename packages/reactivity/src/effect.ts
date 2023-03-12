@@ -6,6 +6,11 @@ export type EffectScheduler = (...args: any[]) => any
 
 export interface ReactiveEffectOptions {
   scheduler?: EffectScheduler
+  onStop?: () => void
+}
+export interface ReactiveEffectRunner<T = any> {
+  (): T
+  effect: ReactiveEffect
 }
 
 // 当前正在执行的 effect 全局使用
@@ -18,6 +23,7 @@ export class ReactiveEffect<T = any> {
   active = true // 默认激活状态
   deps: Dep[] = [] // 让 effect 记录dep
   parent: ReactiveEffect | undefined = undefined // 父 effect 默认null
+  onStop?: () => void
 
   constructor(
     public fn: () => T,
@@ -59,7 +65,13 @@ export class ReactiveEffect<T = any> {
     }
   }
   stop() {
-    this.active = false
+    if (this.active) {
+      cleanupEffect(this)
+      if (this.onStop) {
+        this.onStop()
+      }
+      this.active = false
+    }
   }
 }
 
@@ -83,7 +95,10 @@ function cleanupEffect(effect: ReactiveEffect) {
  * effect可以嵌套写 组件是基于effect
  * @param fn Function
  */
-export function effect<T = any>(fn: () => T, options?: ReactiveEffectOptions) {
+export function effect<T = any>(
+  fn: () => T,
+  options?: ReactiveEffectOptions
+): ReactiveEffectRunner {
   if (!isFunction) console.warn('effect 传入必须是一个函数！')
   const _effect = new ReactiveEffect(fn)
 
@@ -93,7 +108,13 @@ export function effect<T = any>(fn: () => T, options?: ReactiveEffectOptions) {
   _effect.run()
   // runner
   // effect (fn) => runner  runner => fn
-  return _effect.run.bind(_effect)
+  const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
+  runner.effect = _effect
+  return runner
+}
+
+export function stop(runner: any) {
+  runner.effect.stop()
 }
 
 // 存放依赖收集数据 {target -> key -> dep}
@@ -106,7 +127,6 @@ const targetMap = new WeakMap<any, Map<any, Dep>>()
  * @param key unknown 目标元素
  */
 export function track(target: object, type: TrackOpTypes, key: unknown) {
-  console.log(type)
   // 没有在 effect中取值 不收集
   if (!activeEffect) return
   let depsMap = targetMap.get(target)
@@ -142,7 +162,6 @@ export function trackEffects(dep: Dep) {
  * @param key
  */
 export function trigger(target: object, type: TriggerOpTypes, key: unknown) {
-  console.log(type)
   const depsMap = targetMap.get(target)
   // 看有没有没追踪过 没有直接不做操作
   if (!depsMap) return
